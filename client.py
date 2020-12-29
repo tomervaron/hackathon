@@ -2,7 +2,7 @@ import socket
 import struct
 import time
 from threading import Thread
-from pynput import keyboard
+from curtsies import Input
 
 MAGIC_COOKIE = hex(0xfeedbeef)
 MESSAGE_TYPE = hex(0x2)
@@ -39,13 +39,20 @@ while True:
         msg = client_socket_tcp.recv(BUFFER_SIZE)
         print(msg.decode("utf-8"))
         end_time = time.time() + 10
-        with keyboard.Listener(on_press=on_press, suppress=True) as listener:
-            def time_out(time_to_run: int):
-                time.sleep(time_to_run)
-                listener.stop()
+        with Input(keynames='curtsies') as input_generator:
+            for e in Input():
+                if time.time() >= end_time:
+                    break
+                else:
+                    on_press(e)
+
+        # with keyboard.Listener(on_press=on_press, suppress=True) as listener:
+        #     def time_out(time_to_run: int):
+        #         time.sleep(time_to_run)
+        #         listener.stop()
                
-            Thread(target=time_out, args=(10,), ).start()
-            listener.join()
+        #     Thread(target=time_out, args=(10,), ).start()
+        #     listener.join()
 
         break
 client_socket_tcp.close()

@@ -5,10 +5,6 @@ import threading
 import time
 import random
 
-from colorama import Fore
-from colorama import Style
-
-
 
 UDP_PORT = 13117
 TCP_PORT = 13118
