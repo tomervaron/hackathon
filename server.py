@@ -6,7 +6,7 @@ import time
 import random
 
 
-UDP_PORT = 13117
+UDP_PORT = 13107
 TCP_PORT = 13118
 BUFFER_SIZE = 1024
 IP_ADDRESS = socket.gethostbyname(socket.gethostname())

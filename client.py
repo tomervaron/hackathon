@@ -7,7 +7,7 @@ from curtsies import Input
 
 MAGIC_COOKIE = hex(0xfeedbeef)
 MESSAGE_TYPE = hex(0x2)
-UDP_PORT = 13117
+UDP_PORT = 13107
 BUFFER_SIZE = 1024
 
 client_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
