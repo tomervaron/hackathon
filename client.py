@@ -3,7 +3,6 @@ import struct
 import time
 from threading import Thread
 from curtsies import Input
-# import getch
 
 
 MAGIC_COOKIE = hex(0xfeedbeef)
@@ -55,11 +54,9 @@ while True:
                 else:
                     on_press(e)
 
-                   
-        # while time.time()<end_time:
-        #     c = getch.getch()
-        #     on_press(c)
+        game_summary = client_socket_tcp.recv(BUFFER_SIZE)
+        print(game_summary.decode("utf-8"))
 
-        break
+        break #to remove
 client_socket_tcp.close()
 print("client is close")

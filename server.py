@@ -101,6 +101,9 @@ def play_the_game():
         game_summary += winners_names
     
     print(game_summary)
+    for conn in connections_dict.keys():
+        conn.sendall(game_summary.encode("utf-8"))
+
 
 def player_listener(conn, stop_event):
     score = 0
