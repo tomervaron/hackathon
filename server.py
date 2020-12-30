@@ -165,7 +165,7 @@ def run_tcp_socket():
         except:
             continue
     
-    server_socket_tcp.settimeout(2) # to remove
+    server_socket_tcp.settimeout(10) # to remove
     server_socket_tcp.listen(4)
 
     groups_dict ={1:[],2:[]}
