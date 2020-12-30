@@ -24,15 +24,15 @@ while True:
     client_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("​Client started, listening for offer requests...​")
     client_socket_udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    client_socket_udp.bind(('', UDP_PORT))
-    break
-    # while True:
-    #     try:
-    #         client_socket_udp.bind((IP_ADDRESS, UDP_PORT))
-    #         break
-    #     except:
-    #         time.sleep(0.1)
-    #         continue
+    # client_socket_udp.bind(('', UDP_PORT))
+    # break
+    while True:
+        try:
+            client_socket_udp.bind((IP_ADDRESS, UDP_PORT))
+            break
+        except:
+            time.sleep(0.1)
+            continue
     
     # client_socket_udp.settimeout(200) #to remove
 
