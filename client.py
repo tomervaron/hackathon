@@ -45,8 +45,8 @@ while True:
         print(msg.decode("utf-8"))
 
         with Input(keynames='curtsies') as input_generator:
-            e = input_generator.send(10)
             while True:
+                e = input_generator.send(1)
                 if time.time() >= end_time:
                     break
                 elif e == None:
