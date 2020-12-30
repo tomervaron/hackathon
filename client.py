@@ -28,7 +28,7 @@ while True:
     # break
     while True:
         try:
-            client_socket_udp.bind(('255.255.255.255', UDP_PORT))
+            client_socket_udp.bind(('0.0.0.0', UDP_PORT))
             break
         except:
             time.sleep(0.1)
