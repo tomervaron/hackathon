@@ -172,16 +172,20 @@ def run_tcp_socket():
     connections_dict = {}
     while True:
         try:
-            try:
-                connection_socket, client_address = server_socket_tcp.accept()
-            except:
-                if time.time() >= end_time:
-                    raise
-                continue
+            # try:
+            #     connection_socket, client_address = server_socket_tcp.accept()
+            # except:
+            #     if time.time() >= end_time:
+            #         raise
+            #     continue
+            connection_socket, client_address = server_socket_tcp.accept()
             team_name = connection_socket.recv(BUFFER_SIZE)
             connections_dict[connection_socket] = [client_address,0]
             team_name = team_name.decode("utf-8")[:-1]
             random_casting_to_group(connection_socket, team_name)
+        except socket.Timeouterror:
+            if time.time() < end_time:
+                continue
         except:
             message_to_send = message_builder()
             for conn in connections_dict.keys():
