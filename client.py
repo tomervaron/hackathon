@@ -29,6 +29,7 @@ while True:
             client_socket_udp.bind((IP_ADDRESS, UDP_PORT))
             break
         except:
+            time.sleep(0.1)
             continue
     
     # client_socket_udp.settimeout(200) #to remove
