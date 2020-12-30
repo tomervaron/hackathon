@@ -55,7 +55,7 @@ while True:
                 while time.time() < end_time:
                     e = input_generator.send(1)
                     if e is None:
-                    continue
+                        continue
                     else:
                         on_press(e)
                 game_summary = client_socket_tcp.recv(BUFFER_SIZE)
