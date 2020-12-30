@@ -49,13 +49,13 @@ while True:
                 e = input_generator.send(1)
                 # if time.time() >= end_time:
                 #     break
-                if e == None:
+                if e is None:
                    continue
                 else:
                     on_press(e)
 
-        game_summary = client_socket_tcp.recv(BUFFER_SIZE)
-        print(game_summary.decode("utf-8"))
+            game_summary = client_socket_tcp.recv(BUFFER_SIZE)
+            print(game_summary.decode("utf-8"))
 
         break #to remove
 client_socket_tcp.close()
