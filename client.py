@@ -2,8 +2,8 @@ import socket
 import struct
 import time
 from threading import Thread
-# from curtsies import Input
-import getch
+from curtsies import Input
+# import getch
 # import pygame
 
 MAGIC_COOKIE = hex(0xfeedbeef)
