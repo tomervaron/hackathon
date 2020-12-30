@@ -23,12 +23,12 @@ while True:
     client_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     client_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("​Client started, listening for offer requests...​")
-    client_socket_udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    client_socket_udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # client_socket_udp.bind(('', UDP_PORT))
     # break
     while True:
         try:
-            client_socket_udp.bind(('255.255.255.255', UDP_PORT))
+            client_socket_udp.bind(('', UDP_PORT))
             break
         except:
             time.sleep(0.1)
