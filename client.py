@@ -7,7 +7,7 @@ from scapy.arch import get_if_addr
 
 MAGIC_COOKIE = hex(0xfeedbeef)
 MESSAGE_TYPE = hex(0x2)
-UDP_PORT = 13106
+UDP_PORT = 13107
 IP_ADDRESS = get_if_addr("eth1")
 BUFFER_SIZE = 1024
 TEAM_NAME = "Team MiniMax" + "\n"
