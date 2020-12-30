@@ -4,6 +4,7 @@ import time
 from threading import Thread
 # from curtsies import Input
 import getch
+# import pygame
 
 MAGIC_COOKIE = hex(0xfeedbeef)
 MESSAGE_TYPE = hex(0x2)
@@ -34,7 +35,10 @@ while True:
     if hex(msg_unpacked[0]) == MAGIC_COOKIE and hex(msg_unpacked[1]) == MESSAGE_TYPE:
         tcp_server_port = msg_unpacked[2]
         server_ip = server_address[0]
-        client_socket_tcp.connect((server_ip, tcp_server_port))
+        try:
+            client_socket_tcp.connect((server_ip, tcp_server_port))
+        except:
+            continue
         client_socket_tcp.sendall("Team Rocket\n".encode("utf-8"))
         client_socket_udp.close()
         msg = client_socket_tcp.recv(BUFFER_SIZE)
