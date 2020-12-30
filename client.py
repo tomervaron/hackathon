@@ -52,7 +52,7 @@ while True:
             except:
                 continue
             msg = client_socket_tcp.recv(BUFFER_SIZE)
-            end_time = time.time() + 10
+            end_time = time.time() + 8
             print(msg.decode("utf-8"))
 
             with Input(keynames='curtsies') as input_generator:
