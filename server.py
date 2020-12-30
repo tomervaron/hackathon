@@ -112,26 +112,24 @@ def play_the_game():
         game_summary += winners_names
     
     # print(game_summary)
-    connections_key_list = list(connections_dict.keys())
-    lost_counter = 0
-    while len(connections_key_list) > 0:
-        try:
-            connections_key_list[0].sendall(game_summary.encode("utf-8"))
-            connections_key_list.pop(0)
-            lost_counter = 0
-        except:
-            lost_counter += 1
-            if lost_counter == 3: # trying to send the message 3 times
-                print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
-                connections_key_list.pop(0)
-                lost_counter = 0
+    # connections_key_list = list(connections_dict.keys())
+    # lost_counter = 0
+    # while len(connections_key_list) > 0:
+    #     try:
+    #         connections_key_list[0].sendall(game_summary.encode("utf-8"))
+    #         connections_key_list.pop(0)
+    #         lost_counter = 0
+    #     except:
+    #         lost_counter += 1
+    #         if lost_counter == 3: # trying to send the message 3 times
+    #             print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
+    #             connections_key_list.pop(0)
+    #             lost_counter = 0
             
 
-    # for conn in connections_dict.keys():
-    #     try:
-    #         conn.sendall(game_summary.encode("utf-8"))
-    #     except:
-    #         pass
+        for conn in connections_dict.keys():
+            conn.sendall(game_summary.encode("utf-8"))
+        
         
 
 
