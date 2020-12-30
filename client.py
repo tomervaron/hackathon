@@ -45,11 +45,11 @@ while True:
         print(msg.decode("utf-8"))
 
         with Input(keynames='curtsies') as input_generator:
-            while True:
+            while time.time() < end_time:
                 e = input_generator.send(1)
-                if time.time() >= end_time:
-                    break
-                elif e == None:
+                # if time.time() >= end_time:
+                #     break
+                if e == None:
                    continue
                 else:
                     on_press(e)
