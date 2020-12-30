@@ -4,12 +4,14 @@ from threading import Thread
 import threading
 import time
 import random
+from scapy.arch import get_if_addr
 
 
 UDP_PORT = 13107
 TCP_PORT = 13118
 BUFFER_SIZE = 1024
-IP_ADDRESS = socket.gethostbyname(eth1,socket.gethostname())
+#IP_ADDRESS = socket.gethostbyname(socket.gethostname())
+IP_ADDRESS = get_if_addr("eth1")
 groups_dict ={1:[],2:[]}
 connections_dict = {}
 
