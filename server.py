@@ -55,6 +55,7 @@ def message_builder():
 def play_the_game():
     list_of_players_threads = []
     list_of_stop_event = []
+    print("Game started!\n")
     for conn in connections_dict.keys():
         stop_event = threading.Event()
         list_of_stop_event.append(stop_event)
@@ -69,8 +70,8 @@ def play_the_game():
     for thread in list_of_players_threads:
         thread.join()
     
-    for conn in connections_dict.keys():
-        print("{} score: {}\n".format(get_team_name_via_conn(conn),connections_dict[conn][1]))
+    # for conn in connections_dict.keys():
+    #     print("{} score: {}\n".format(get_team_name_via_conn(conn),connections_dict[conn][1]))
 
     team_1_score = 0
     for tup in groups_dict[1]:
@@ -100,9 +101,28 @@ def play_the_game():
             winners_names = get_teams_name(2)
         game_summary += winners_names
     
-    print(game_summary)
-    for conn in connections_dict.keys():
-        conn.sendall(game_summary.encode("utf-8"))
+    # print(game_summary)
+    connections_key_list = list(connections_dict.keys())
+    lost_counter = 0
+    while len(connections_key_list) > 0:
+        try:
+            connections_key_list[0].sendall(game_summary.encode("utf-8"))
+            connections_key_list.remove(0)
+            lost_counter = 0
+        except:
+            lost_counter += 1
+            if lost_counter == 3: # trying to send the message 3 times
+                print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
+                connections_key_list.remove(0)
+                lost_counter = 0
+            
+
+    # for conn in connections_dict.keys():
+    #     try:
+    #         conn.sendall(game_summary.encode("utf-8"))
+    #     except:
+    #         pass
+        
 
 
 def player_listener(conn, stop_event):
@@ -123,24 +143,40 @@ def player_listener(conn, stop_event):
 
 def send_udp():
     server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    message = struct.pack('Ibh', 0xfeedbeef, 0x2, TCP_PORT)
+    server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
     end_time = time.time() + 10
     while  time.time() < end_time:
-        message = struct.pack('Ibh', 0xfeedbeef, 0x2, TCP_PORT)
-        server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
-        server_socket_udp.sendto(message,('<broadcast>', UDP_PORT))
-        time.sleep(1)
+        try:
+            server_socket_udp.sendto(message,('<broadcast>', UDP_PORT))
+            time.sleep(1)
+        except:
+            continue
     server_socket_udp.close()
 
 def run_tcp_socket():
+    end_time = time.time() + 10
     server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Server started, listening on IP address "+str(IP_ADDRESS))
-    server_socket_tcp.bind(('',TCP_PORT))
-    server_socket_tcp.settimeout(10) # to remove
-    server_socket_tcp.listen(4)
-
     while True:
         try:
-            connection_socket, client_address = server_socket_tcp.accept()
+            server_socket_tcp.bind(('',TCP_PORT))
+            break
+        except:
+            continue
+    
+    server_socket_tcp.settimeout(1) # to remove
+    server_socket_tcp.listen(4)
+
+    groups_dict ={1:[],2:[]}
+    connections_dict = {}
+    while True:
+        try:
+            try:
+                connection_socket, client_address = server_socket_tcp.accept()
+            except:
+                if time.time() >= end_time:
+                    raise
             team_name = connection_socket.recv(BUFFER_SIZE)
             connections_dict[connection_socket] = [client_address,0]
             team_name = team_name.decode("utf-8")[:-1]
@@ -148,16 +184,46 @@ def run_tcp_socket():
         except:
             message_to_send = message_builder()
             for conn in connections_dict.keys():
-                conn.sendall(message_to_send.encode("utf-8"))
+                connections_key_list = list(connections_dict.keys())
+                lost_counter = 0
+                while len(connections_key_list) > 0:
+                    try:
+                        connections_key_list[0].sendall(message_to_send.encode("utf-8"))
+                        connections_key_list.remove(0)
+                        lost_counter = 0
+                    except:
+                        lost_counter += 1
+                        if lost_counter == 3: # trying to send the message 3 times
+                            print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
+                            connections_key_list.remove(0)
+                            lost_counter = 0
             play_the_game()
             server_socket_tcp.close()
+            print("\nGame over, sending out offer requests...\n")
             break
 
 
-    
-udp_thread = Thread(target=send_udp)
-tcp_thread = Thread(target=run_tcp_socket)
-udp_thread.start()
-tcp_thread.start()
-udp_thread.join()
-tcp_thread.join()
+while True:    
+    udp_thread = Thread(target=send_udp)
+    tcp_thread = Thread(target=run_tcp_socket)
+    udp_thread.start()
+    tcp_thread.start()
+    udp_thread.join()
+    tcp_thread.join()
+
+
+
+
+    connections_key_list = list(connections_dict.keys())
+    lost_counter = 0
+    while len(connections_key_list) > 0:
+        try:
+            connections_key_list[0].sendall(game_summary.encode("utf-8"))
+            connections_key_list.remove(0)
+            lost_counter = 0
+        except:
+            lost_counter += 1
+            if lost_counter == 3: # trying to send the message 3 times
+                print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
+                connections_key_list.remove(0)
+                lost_counter = 0
