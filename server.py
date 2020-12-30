@@ -159,7 +159,7 @@ def run_tcp_socket():
     print("Server started, listening on IP address "+str(IP_ADDRESS))
     while True:
         try:
-            server_socket_tcp.bind(('',TCP_PORT))
+            server_socket_tcp.bind((IP_ADDRESS,TCP_PORT))
             break
         except:
             continue

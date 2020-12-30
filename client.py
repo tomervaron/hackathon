@@ -3,11 +3,12 @@ import struct
 import time
 from threading import Thread
 from curtsies import Input
-
+from scapy.arch import get_if_addr
 
 MAGIC_COOKIE = hex(0xfeedbeef)
 MESSAGE_TYPE = hex(0x2)
 UDP_PORT = 13107
+IP_ADDRESS = get_if_addr("eth1")
 BUFFER_SIZE = 1024
 TEAM_NAME = "Team MiniMax" + "\n"
 
@@ -25,7 +26,7 @@ while True:
     client_socket_udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     while True:
         try:
-            client_socket_udp.bind(('', UDP_PORT))
+            client_socket_udp.bind((IP_ADDRESS, UDP_PORT))
             break
         except:
             continue
