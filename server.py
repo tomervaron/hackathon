@@ -147,7 +147,7 @@ def send_udp():
     server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     message = struct.pack('Ibh', 0xfeedbeef, 0x2, TCP_PORT)
     server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
-    server_socket_udp.bind((IP_ADDRESS,UDP_PORT))
+    # server_socket_udp.bind((IP_ADDRESS,UDP_PORT))
     end_time = time.time() + 10
     while time.time() < end_time:
         server_socket_udp.sendto(message,('<broadcast>', UDP_PORT))
