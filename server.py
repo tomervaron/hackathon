@@ -177,6 +177,7 @@ def run_tcp_socket():
             except:
                 if time.time() >= end_time:
                     raise
+                continue
             team_name = connection_socket.recv(BUFFER_SIZE)
             connections_dict[connection_socket] = [client_address,0]
             team_name = team_name.decode("utf-8")[:-1]
