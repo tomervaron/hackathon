@@ -107,13 +107,13 @@ def play_the_game():
     while len(connections_key_list) > 0:
         try:
             connections_key_list[0].sendall(game_summary.encode("utf-8"))
-            connections_key_list.remove(0)
+            connections_key_list.pop(0)
             lost_counter = 0
         except:
             lost_counter += 1
             if lost_counter == 3: # trying to send the message 3 times
                 print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
-                connections_key_list.remove(0)
+                connections_key_list.pop(0)
                 lost_counter = 0
             
 
@@ -190,13 +190,13 @@ def run_tcp_socket():
                 while len(connections_key_list) > 0:
                     try:
                         connections_key_list[0].sendall(message_to_send.encode("utf-8"))
-                        connections_key_list.remove(0)
+                        connections_key_list.pop(0)
                         lost_counter = 0
                     except:
                         lost_counter += 1
                         if lost_counter == 3: # trying to send the message 3 times
                             print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
-                            connections_key_list.remove(0)
+                            connections_key_list.pop(0)
                             lost_counter = 0
             play_the_game()
             server_socket_tcp.close()
@@ -220,11 +220,11 @@ while True:
     while len(connections_key_list) > 0:
         try:
             connections_key_list[0].sendall(game_summary.encode("utf-8"))
-            connections_key_list.remove(0)
+            connections_key_list.pop(0)
             lost_counter = 0
         except:
             lost_counter += 1
             if lost_counter == 3: # trying to send the message 3 times
                 print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
-                connections_key_list.remove(0)
+                connections_key_list.pop(0)
                 lost_counter = 0
