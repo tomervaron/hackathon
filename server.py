@@ -183,10 +183,9 @@ def run_tcp_socket():
             connections_dict[connection_socket] = [client_address,0]
             team_name = team_name.decode("utf-8")[:-1]
             random_casting_to_group(connection_socket, team_name)
-        except socket.Timeouterror:
+        except:
             if time.time() < end_time:
                 continue
-        except:
             message_to_send = message_builder()
             for conn in connections_dict.keys():
                 connections_key_list = list(connections_dict.keys())
