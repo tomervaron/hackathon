@@ -20,20 +20,24 @@ def random_casting_to_group(connection_socket, team_name):
     group_num = random.randint(1,2)
     if group_num == 1:
         if len(groups_dict[1]) > 0 and len(groups_dict[2]) == 0:
-            groups_dict[2].append((connection_socket, team_name))
+            # groups_dict[2].append((connection_socket, team_name))
+            groups_dict[2].append([team_name, 0])
         else:
-             groups_dict[1].append((connection_socket, team_name))
+            #  groups_dict[1].append((connection_socket, team_name))
+            groups_dict[1].append([team_name, 0])
     else:
         if len(groups_dict[2]) > 0 and len(groups_dict[1]) == 0:
-            groups_dict[1].append((connection_socket, team_name))
+            # groups_dict[1].append((connection_socket, team_name))
+            groups_dict[1].append([team_name, 0])
         else:
-            groups_dict[2].append((connection_socket, team_name))
+            # groups_dict[2].append((connection_socket, team_name))
+            groups_dict[2].append([team_name, 0])
 
 
 def get_teams_name(num_of_group):
     names = ""
     for tup in groups_dict[num_of_group]:
-        names+=tup[1]+"\n"
+        names+=tup[0]+"\n"
     return names
 
 def get_team_name_via_conn(conn):
@@ -77,13 +81,16 @@ def play_the_game():
     
     team_1_score = 0
     for tup in groups_dict[1]:
-        team_1_score += connections_dict[tup[0]][1]
+        # team_1_score += connections_dict[tup[0]][1]
+        team_1_score += tup[1]
         # team_1_score += connections_dict[tup][1]
     
     team_2_score = 0
     for tup in groups_dict[2]:
-        team_2_score += connections_dict[tup[0]][1]
+        # team_2_score += connections_dict[tup[0]][1]
+        team_2_score += tup[1]
         # team_2_score += connections_dict[tup][1]
+
     winner = ""
     if team_1_score > team_2_score:
         winner = "Group 1 wins!"
@@ -140,7 +147,13 @@ def player_listener(conn, stop_event):
         except:
             if stop_event.is_set():
                 break
-    connections_dict[conn][1] = score
+    # connections_dict[conn][1] = score
+    team_name = connections_dict[conn][2]
+    for group in groups_dict:
+        for name_n_score in groups_dict[group]:
+            if name_n_score[0] == team_name:
+                groups_dict[group][1] = score
+                break
 
 
 
@@ -181,8 +194,9 @@ def run_tcp_socket():
             #     continue
             connection_socket, client_address = server_socket_tcp.accept()
             team_name = connection_socket.recv(BUFFER_SIZE)
-            connections_dict[connection_socket] = [client_address,0]
+            connections_dict[connection_socket] = [client_address,0,team_name]
             print (len(connections_dict))
+            # connection_socket
             team_name = team_name.decode("utf-8")[:-1]
             random_casting_to_group(connection_socket, team_name)
         except:
