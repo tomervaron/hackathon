@@ -219,6 +219,7 @@ def run_tcp_socket():
                     connections_key_list.pop(0)
                     lost_counter = 0
     play_the_game()
+    time.sleep(2)
     server_socket_tcp.close()
     print("\nGame over, sending out offer requests...\n")
     # break
