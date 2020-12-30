@@ -46,8 +46,9 @@ while True:
 
         with Input(keynames='curtsies') as input_generator:
             while time.time() < end_time:
-                e = input_generator.send(10)
+                e = input_generator.send(1)
                 if time.time() >= end_time:
+
                     break
                 elif e == None:
                    continue
