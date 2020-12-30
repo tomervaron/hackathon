@@ -9,7 +9,7 @@ import random
 UDP_PORT = 13107
 TCP_PORT = 13118
 BUFFER_SIZE = 1024
-IP_ADDRESS = socket.gethostbyname(socket.gethostname())
+IP_ADDRESS = socket.gethostbyname(eth1,socket.gethostname())
 groups_dict ={1:[],2:[]}
 connections_dict = {}
 
