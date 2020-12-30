@@ -146,12 +146,9 @@ def send_udp():
     message = struct.pack('Ibh', 0xfeedbeef, 0x2, TCP_PORT)
     server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
     end_time = time.time() + 10
-    while  time.time() < end_time:
-        try:
-            server_socket_udp.sendto(message,('<broadcast>', UDP_PORT))
-            time.sleep(1)
-        except:
-            continue
+    while time.time() < end_time:
+        server_socket_udp.sendto(message,('<broadcast>', UDP_PORT))
+        time.sleep(1)
     server_socket_udp.close()
 
 def run_tcp_socket():
@@ -206,11 +203,12 @@ def run_tcp_socket():
             print("\nGame over, sending out offer requests...\n")
             break
 
-
-while True:    
+i=0
+while i<1:    
     udp_thread = Thread(target=send_udp)
     tcp_thread = Thread(target=run_tcp_socket)
     udp_thread.start()
     tcp_thread.start()
     udp_thread.join()
     tcp_thread.join()
+    i += 1
