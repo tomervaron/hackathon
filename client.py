@@ -46,10 +46,12 @@ while True:
         end_time = time.time() + 10
 
         with Input(keynames='curtsies') as input_generator:
-            input_generator._wait_for_read_ready_or_timeout(10)
-            for e in Input():
+            while time.time() < end_time:
+                e = input_generator.send(10)
                 if time.time() >= end_time:
                     break
+                elif e == None:
+                   pass
                 else:
                     on_press(e)
 
