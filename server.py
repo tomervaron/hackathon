@@ -74,7 +74,7 @@ def play_the_game():
     
     # for conn in connections_dict.keys():
     #     print("{} score: {}\n".format(get_team_name_via_conn(conn),connections_dict[conn][1]))
-    print(len(connections_dict))
+    
     team_1_score = 0
     for tup in groups_dict[1]:
         team_1_score += connections_dict[tup[0]][1]
@@ -182,6 +182,7 @@ def run_tcp_socket():
             connection_socket, client_address = server_socket_tcp.accept()
             team_name = connection_socket.recv(BUFFER_SIZE)
             connections_dict[connection_socket] = [client_address,0]
+            print(len(connections_dict) + "---------")
             team_name = team_name.decode("utf-8")[:-1]
             random_casting_to_group(connection_socket, team_name)
         except:
