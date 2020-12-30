@@ -51,7 +51,7 @@ while True:
                 if time.time() >= end_time:
                     break
                 elif e == None:
-                   pass
+                   continue
                 else:
                     on_press(e)
 
