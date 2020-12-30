@@ -74,7 +74,7 @@ def play_the_game():
     
     # for conn in connections_dict.keys():
     #     print("{} score: {}\n".format(get_team_name_via_conn(conn),connections_dict[conn][1]))
-
+    print(len(connections_dict))
     team_1_score = 0
     for tup in groups_dict[1]:
         team_1_score += connections_dict[tup[0]][1]
