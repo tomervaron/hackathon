@@ -41,12 +41,12 @@ while True:
         client_socket_tcp.sendall("Team Rocket\n".encode("utf-8"))
         client_socket_udp.close()
         msg = client_socket_tcp.recv(BUFFER_SIZE)
-        print(msg.decode("utf-8"))
         end_time = time.time() + 10
+        print(msg.decode("utf-8"))
 
         with Input(keynames='curtsies') as input_generator:
+            e = input_generator.send(10)
             while True:
-                e = input_generator.send(1)
                 if time.time() >= end_time:
                     break
                 elif e == None:
