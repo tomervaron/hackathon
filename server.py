@@ -150,7 +150,7 @@ def send_udp():
     # server_socket_udp.bind((IP_ADDRESS,UDP_PORT))
     end_time = time.time() + 10
     while time.time() < end_time:
-        server_socket_udp.sendto(message,('<broadcast>', UDP_PORT))
+        server_socket_udp.sendto(message,(IP_ADDRESS, UDP_PORT))
         time.sleep(1)
     server_socket_udp.close()
 
