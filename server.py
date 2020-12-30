@@ -167,7 +167,7 @@ def run_tcp_socket():
             continue
     
     server_socket_tcp.settimeout(10) # to remove
-    server_socket_tcp.listen(4)
+    server_socket_tcp.listen()
 
     groups_dict ={1:[],2:[]}
     connections_dict = {}
@@ -182,31 +182,32 @@ def run_tcp_socket():
             connection_socket, client_address = server_socket_tcp.accept()
             team_name = connection_socket.recv(BUFFER_SIZE)
             connections_dict[connection_socket] = [client_address,0]
-            print(len(connections_dict) + "---------")
+            print (len(connections_dict))
             team_name = team_name.decode("utf-8")[:-1]
             random_casting_to_group(connection_socket, team_name)
         except:
             if time.time() < end_time:
                 continue
-            message_to_send = message_builder()
-            for conn in connections_dict.keys():
-                connections_key_list = list(connections_dict.keys())
-                lost_counter = 0
-                while len(connections_key_list) > 0:
-                    try:
-                        connections_key_list[0].sendall(message_to_send.encode("utf-8"))
-                        connections_key_list.pop(0)
-                        lost_counter = 0
-                    except:
-                        lost_counter += 1
-                        if lost_counter == 3: # trying to send the message 3 times
-                            print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
-                            connections_key_list.pop(0)
-                            lost_counter = 0
-            play_the_game()
-            server_socket_tcp.close()
-            print("\nGame over, sending out offer requests...\n")
             break
+    message_to_send = message_builder()
+    for conn in connections_dict.keys():
+        connections_key_list = list(connections_dict.keys())
+        lost_counter = 0
+        while len(connections_key_list) > 0:
+            try:
+                connections_key_list[0].sendall(message_to_send.encode("utf-8"))
+                connections_key_list.pop(0)
+                lost_counter = 0
+            except:
+                lost_counter += 1
+                if lost_counter == 3: # trying to send the message 3 times
+                    print("lost connection with " + str(connections_dict[connections_key_list[0]][0][0]) +"\n")
+                    connections_key_list.pop(0)
+                    lost_counter = 0
+    play_the_game()
+    server_socket_tcp.close()
+    print("\nGame over, sending out offer requests...\n")
+    # break
 
 i=0
 while i<1:    
