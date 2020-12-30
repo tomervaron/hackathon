@@ -77,13 +77,13 @@ def play_the_game():
 
     team_1_score = 0
     for tup in groups_dict[1]:
-        # team_1_score += connections_dict[tup[0]][1]
-        team_1_score += connections_dict[tup][1]
+        team_1_score += connections_dict[tup[0]][1]
+        # team_1_score += connections_dict[tup][1]
     
     team_2_score = 0
     for tup in groups_dict[2]:
-        # team_2_score += connections_dict[tup[0]][1]
-        team_2_score += connections_dict[tup][1]
+        team_2_score += connections_dict[tup[0]][1]
+        # team_2_score += connections_dict[tup][1]
     winner = ""
     if team_1_score > team_2_score:
         winner = "Group 1 wins!"
