@@ -6,10 +6,6 @@ import time
 import random
 from scapy.arch import get_if_addr
 
-
-GROUPS_DICT ={1:[],2:[]}
-CONNECTIONS_DICT = {}
-
 class server:
     def __init__(self, eth_num):
         self.UDP_PORT = 13107
@@ -26,17 +22,17 @@ class server:
         self.random_group_num = 0
         self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
         self.server_socket_tcp.bind((self.IP_ADDRESS,self.TCP_PORT))
+        self.BROADCAST_IP = '172.1.255.255'
         
-
 
     def run_udp(self):
         end_time = time.time() + 10
         broadcast_message = struct.pack('Ibh', 0xfeedbeef, 0x2, self.TCP_PORT)
         while time.time() < end_time:
-            self.server_socket_udp.sendto(broadcast_message,('172.1.255.255', self.UDP_PORT))
+            self.server_socket_udp.sendto(broadcast_message,(self.BROADCAST_IP, self.UDP_PORT))
             time.sleep(1)
         self.GAME_ON = True
-        # self.server_socket_udp.close()
+
 
     def run_tcp(self):
         self.random_group_num = random.randint(1,2)
@@ -61,7 +57,6 @@ class server:
         for conn in self.CONNECTIONS_DICT.keys():
             conn.sendall(start_message.encode("utf-8"))
         self.run_the_game()
-#       server_socket_tcp.close()
                        
 
     def run_the_game(self):
@@ -71,9 +66,11 @@ class server:
         game_summary_message = self.game_summary_builder(team_1_score, team_2_score)
         self.send_summary_message_to_players(game_summary_message)
 
+
     def send_game_over_message(self):
         for conn in self.CONNECTIONS_DICT.keys():
             conn.sendall("Game Over".encode("utf-8"))
+
 
     def calculate_score(self):
         team_1_score = 0
@@ -84,6 +81,7 @@ class server:
             else:
                 team_2_score += conn_lst[2]
         return team_1_score, team_2_score
+
 
     def game_summary_builder(self, team_1_score, team_2_score):
         winner = ""
@@ -107,6 +105,7 @@ class server:
                 winners_names = self.get_teams_name_from_group(2)
             game_summary += winners_names
         return game_summary
+
 
     def send_summary_message_to_players(self, summary_message):
         for conn in self.CONNECTIONS_DICT.keys():
@@ -151,6 +150,7 @@ class server:
         score = 0
         self.CONNECTIONS_DICT[connection_socket] = [team_name, group_num, score]
     
+
     def message_builder(self):
         start_message = "Welcome to Keyboard Spamming Battle Royale.\nGroup 1:\n==\n"
         group_1_names = self.get_teams_name_from_group(1)
@@ -161,6 +161,7 @@ class server:
         start_message +="\nStart pressing keys on your keyboard as fast as you can!!"
         return start_message       
 
+
     def get_teams_name_from_group(self, group_num):
         names_in_group = ""
         for lst in self.CONNECTIONS_DICT.values():
@@ -168,15 +169,15 @@ class server:
                 names_in_group += lst[0]
         return names_in_group 
 
+
     def reset_server(self):
         for sock in self.CONNECTIONS_DICT.keys():
             sock.shutdown(socket.SHUT_RDWR)
             sock.close()
         self.CONNECTIONS_DICT = {}
-        # self.server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # self.server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.random_group_num = 0
         self.GAME_ON = False
+
 
     def run_server(self):
         while True:

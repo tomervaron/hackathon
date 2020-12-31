@@ -15,7 +15,6 @@ class client:
         self.BUFFER_SIZE = 1024
         self.TEAM_NAME = team_name + "\n"
         self.GAME_ON = False
-        # self.client_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.client_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.client_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.tcp_server_port = None
@@ -24,8 +23,6 @@ class client:
         self.client_socket_udp.bind(('', self.UDP_PORT))
 
     def listen_to_udp(self):
-        # self.client_socket_udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.client_socket_udp.bind(('', self.UDP_PORT))
         while True:
             msg , server_address  = self.client_socket_udp.recvfrom(self.BUFFER_SIZE)
             print("Received offer from " + str(server_address[0]) + " attempting to connect...​")
@@ -34,7 +31,6 @@ class client:
                 self.tcp_server_port = msg_unpacked[2]
                 self.server_ip = server_address[0]
                 self.connect_to_server_tcp()
-                # self.client_socket_udp.close()
                 break          
 
     def connect_to_server_tcp(self):
@@ -103,6 +99,3 @@ if __name__ == "__main__":
     team_name = "Tomer's Team"
     client = client(team_name)
     client.run_client()
-
-#     client_socket_tcp.close()
-
