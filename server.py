@@ -24,23 +24,23 @@ class server:
         self.server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.random_group_num = 0
+        self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
+        self.server_socket_tcp.bind((self.IP_ADDRESS,self.TCP_PORT))
         
 
 
     def run_udp(self):
         end_time = time.time() + 10
         broadcast_message = struct.pack('Ibh', 0xfeedbeef, 0x2, self.TCP_PORT)
-        self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
         while time.time() < end_time:
-            self.server_socket_udp.sendto(broadcast_message,('<broadcast>', self.UDP_PORT))
+            self.server_socket_udp.sendto(broadcast_message,('172.1.255.255', self.UDP_PORT))
             time.sleep(1)
         self.GAME_ON = True
-        self.server_socket_udp.close()
+        # self.server_socket_udp.close()
 
     def run_tcp(self):
         self.random_group_num = random.randint(1,2)
         print("Server started, listening on IP address "+str(self.IP_ADDRESS))
-        self.server_socket_tcp.bind((self.IP_ADDRESS,self.TCP_PORT))
         self.server_socket_tcp.settimeout(0.5)
         self.server_socket_tcp.listen()
         while not self.GAME_ON:
@@ -66,10 +66,14 @@ class server:
 
     def run_the_game(self):
         self.run_all_listeners()
+        self.send_game_over_message()
         team_1_score, team_2_score = self.calculate_score()
         game_summary_message = self.game_summary_builder(team_1_score, team_2_score)
         self.send_summary_message_to_players(game_summary_message)
 
+    def send_game_over_message(self):
+        for conn in self.CONNECTIONS_DICT.keys():
+            conn.sendall("Game Over".encode("utf-8"))
 
     def calculate_score(self):
         team_1_score = 0
@@ -127,19 +131,21 @@ class server:
             thread.join()
 
 
+
     def listen_to_player(self, conn, stop_event):
         score = 0
         while not stop_event.is_set():
             try:
                 conn.settimeout(2)
-                conn.recv(BUFFER_SIZE)
+                conn.recv(self.BUFFER_SIZE)
                 if stop_event.is_set():
                     break
                 score += 1
             except:
                 if stop_event.is_set():
                     break
-        self.CONNECTIONS_DICT[conn][2] = score    
+        self.CONNECTIONS_DICT[conn][2] = score
+          
 
     def random_casting_to_group(self, connection_socket, team_name, group_num):
         score = 0
@@ -163,10 +169,14 @@ class server:
         return names_in_group 
 
     def reset_server(self):
+        for sock in self.CONNECTIONS_DICT.keys():
+            sock.shutdown(socket.SHUT_RDWR)
+            sock.close()
         self.CONNECTIONS_DICT = {}
-        self.server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # self.server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.random_group_num = 0
+        self.GAME_ON = False
 
     def run_server(self):
         while True:
@@ -176,7 +186,7 @@ class server:
             tcp_thread.start()
             udp_thread.join()
             tcp_thread.join()
-            time.sleep(1)
+            time.sleep(3)
             self.reset_server()
 
 
