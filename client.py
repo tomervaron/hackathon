@@ -4,6 +4,8 @@ import time
 from threading import Thread
 from curtsies import Input
 from scapy.arch import get_if_addr
+import ColorMessages
+import random
 
 
 class client:
@@ -34,7 +36,7 @@ class client:
         """
         while True:
             msg , server_address  = self.client_socket_udp.recvfrom(self.BUFFER_SIZE)
-            print("Received offer from " + str(server_address[0]) + " attempting to connect...​")
+            print("Received offer from " + ColorMessages.red + str(server_address[0]) + ColorMessages.reset + " attempting to connect...​")
             msg_unpacked = struct.unpack("Ibh", msg)
             if hex(msg_unpacked[0]) == self.MAGIC_COOKIE and hex(msg_unpacked[1]) == self.MESSAGE_TYPE:
                 self.tcp_server_port = msg_unpacked[2]
@@ -55,7 +57,15 @@ class client:
         get the message that the game is starting
         """
         start_message = self.client_socket_tcp.recv(self.BUFFER_SIZE)
-        print(start_message.decode("utf-8"))
+        start_message_decoded = start_message.decode("utf-8")
+        msg_to_print = ""
+        for msg_char in start_message_decoded:
+            if msg_char == " " or msg_char == "\n":
+                msg_to_print += msg_char
+            else:
+                num_of_color = random.randint(0, len(ColorMessages.colors) - 1)
+                msg_to_print += ColorMessages.colors[num_of_color] + msg_char + ColorMessages.reset
+        print(msg_to_print)
         self.GAME_ON = True
 
     def listen_to_server(self):
@@ -69,7 +79,15 @@ class client:
                 self.GAME_ON = False
                 break
         summary_message = self.client_socket_tcp.recv(self.BUFFER_SIZE)
-        print(summary_message.decode("utf-8"))
+        summary_message_decoded = summary_message.decode("utf-8")
+        msg_to_print = ""
+        for msg_char in summary_message_decoded:
+            if msg_char == " " or msg_char == "\n":
+                msg_to_print += msg_char
+            else:
+                num_of_color = random.randint(0, len(ColorMessages.colors) - 1)
+                msg_to_print += ColorMessages.colors[num_of_color] + msg_char + ColorMessages.reset
+        print(msg_to_print)
 
 
     def listen_to_keyboard(self):
