@@ -387,7 +387,7 @@ class server:
     def get_teams_name_from_group(self, group_num):
         names_in_group = ""
         for lst in self.CONNECTIONS_DICT.values():
-            if lst[1] == group_num
+            if lst[1] == group_num:
                 names_in_group += lst[0]
         return names_in_group 
 
