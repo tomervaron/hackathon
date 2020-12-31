@@ -32,7 +32,7 @@ class server:
             self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
             self.server_socket_udp.sendto(broadcast_message,('<broadcast>', self.UDP_PORT))
             time.sleep(1)
-        server_socket_udp.close()
+        self.server_socket_udp.close()
 
     def run_tcp(self):
         self.random_group_num = random.randint(1,2)
@@ -72,9 +72,9 @@ class server:
         team_2_score = 0
         for conn_lst in self.CONNECTIONS_DICT.values():
             if conn_lst[1] == 1:
-                team_1_score += lst[2] 
+                team_1_score += conn_lst[2] 
             else:
-                team_2_score += lst[2]
+                team_2_score += conn_lst[2]
         return team_1_score, team_2_score
 
     def game_summary_builder(self, team_1_score, team_2_score):
