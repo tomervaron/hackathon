@@ -1,8 +1,6 @@
 import socket
 import struct
 import time
-import random
-import ColorMessage
 from threading import Thread
 from curtsies import Input
 from scapy.arch import get_if_addr
@@ -36,7 +34,7 @@ class client:
         """
         while True:
             msg , server_address  = self.client_socket_udp.recvfrom(self.BUFFER_SIZE)
-            print("Received offer from " + ColorMessage.red + str(server_address[0])+ColorMessage.reset + " attempting to connect...​")
+            print("Received offer from " + str(server_address[0]) + " attempting to connect...​")
             msg_unpacked = struct.unpack("Ibh", msg)
             if hex(msg_unpacked[0]) == self.MAGIC_COOKIE and hex(msg_unpacked[1]) == self.MESSAGE_TYPE:
                 self.tcp_server_port = msg_unpacked[2]
@@ -57,13 +55,7 @@ class client:
         get the message that the game is starting
         """
         start_message = self.client_socket_tcp.recv(self.BUFFER_SIZE)
-        start_message_decoded = start_message.decode("utf-8")
-        msg_to_print = ""
-        for msg_char in start_message_decoded:
-            if msg_char != "" and msg_char != "\n":
-                num_of_color = random.randint(0, len(ColorMessage.colors) - 1)
-                msg_to_print += ColorMessage.colors[num_of_color] + msg_char + ColorMessage.reset
-        print(msg_to_print)
+        print(start_message.decode("utf-8"))
         self.GAME_ON = True
 
     def listen_to_server(self):
@@ -77,16 +69,7 @@ class client:
                 self.GAME_ON = False
                 break
         summary_message = self.client_socket_tcp.recv(self.BUFFER_SIZE)
-
-        summary_message_decoded = summary_message.decode("utf-8")
-        msg_to_print = ""
-        for msg_char in summary_message_decoded:
-            if msg_char != "" and msg_char != "\n":
-                num_of_color = random.randint(0, len(ColorMessage.colors) - 1)
-                msg_to_print += ColorMessage.colors[num_of_color] + msg_char + ColorMessage.reset
-        print(msg_to_print)
-
-        # print(summary_message.decode("utf-8"))
+        print(summary_message.decode("utf-8"))
 
 
     def listen_to_keyboard(self):
