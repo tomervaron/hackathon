@@ -239,6 +239,8 @@ from threading import Thread
 import threading
 import time
 import random
+from scapy.arch import get_if_addr
+
 
 GROUPS_DICT ={1:[],2:[]}
 CONNECTIONS_DICT = {}
