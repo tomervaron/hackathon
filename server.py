@@ -7,11 +7,20 @@ import random
 from scapy.arch import get_if_addr
 
 class server:
+    """
+    server class for the Keyboard Spamming Battle Royale.
+    """
     def __init__(self, eth_num):
+        """
+        :param eth_num: 1 for development and 2 for testing.
+        building a server object. 
+        """
+        self.MAGIC_COOKIE = hex(0xfeedbeef)
+        self.MESSAGE_TYPE = hex(0x2)
         self.UDP_PORT = 13107
         self.TCP_PORT = 13118
-        self.BUFFER_SIZE = 1024
-        self.GAME_ON = False
+        self.BUFFER_SIZE = 1024 
+        self.GAME_ON = False  # True if the game started and else false
         self.CONNECTIONS_DICT = {}
         if eth_num == 1:
             self.IP_ADDRESS = get_if_addr("eth1")
@@ -19,15 +28,19 @@ class server:
             self.IP_ADDRESS = get_if_addr("eth2")
         self.server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.random_group_num = 0
+        self.random_group_num = 0 # classify the client team to groups 1/2 randomly. 
         self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
         self.server_socket_tcp.bind((self.IP_ADDRESS,self.TCP_PORT))
         self.BROADCAST_IP = '172.1.255.255'
+        self.GAME_DURATION = 10
         
 
     def run_udp(self):
+        """
+        method to send offers every second in udp.
+        """
         end_time = time.time() + 10
-        broadcast_message = struct.pack('Ibh', 0xfeedbeef, 0x2, self.TCP_PORT)
+        broadcast_message = struct.pack('Ibh', self.MAGIC_COOKIE, self.MESSAGE_TYPE, self.TCP_PORT)
         while time.time() < end_time:
             self.server_socket_udp.sendto(broadcast_message,(self.BROADCAST_IP, self.UDP_PORT))
             time.sleep(1)
@@ -35,6 +48,12 @@ class server:
 
 
     def run_tcp(self):
+        """
+        method to deal with tcp.
+        this method will do the connections with the client via tcp
+        and assign the clients to groups.
+        at the end, the game is starting and clients get a message that the game started.
+        """
         self.random_group_num = random.randint(1,2)
         print("Server started, listening on IP address "+str(self.IP_ADDRESS))
         self.server_socket_tcp.settimeout(0.5)
@@ -60,6 +79,11 @@ class server:
                        
 
     def run_the_game(self):
+        """
+        main game method.
+        listen to all clients in different threads.
+        calculate the score for each group and send the summary message.
+        """
         self.run_all_listeners()
         self.send_game_over_message()
         team_1_score, team_2_score = self.calculate_score()
@@ -68,11 +92,17 @@ class server:
 
 
     def send_game_over_message(self):
+        """
+        sends a message to all the clients that the game over.
+        """
         for conn in self.CONNECTIONS_DICT.keys():
             conn.sendall("Game Over".encode("utf-8"))
 
 
     def calculate_score(self):
+        """
+        collect the score from each team and sum them by groups.
+        """
         team_1_score = 0
         team_2_score = 0
         for conn_lst in self.CONNECTIONS_DICT.values():
@@ -84,6 +114,9 @@ class server:
 
 
     def game_summary_builder(self, team_1_score, team_2_score):
+        """
+        build the message that will be print on client screen.
+        """
         winner = ""
         if team_1_score > team_2_score:
             winner = "Group 1 wins!"
@@ -108,11 +141,18 @@ class server:
 
 
     def send_summary_message_to_players(self, summary_message):
+        """
+        send the summary message to all clients. 
+        :param summary_message: string of message
+        """
         for conn in self.CONNECTIONS_DICT.keys():
             conn.sendall(summary_message.encode("utf-8"))
 
 
     def run_all_listeners(self):
+        """
+        make the server multi threaded that will listen to each client separately
+        """
         list_of_players_threads = []
         list_of_stop_event = []
         for conn in self.CONNECTIONS_DICT.keys():
@@ -120,10 +160,11 @@ class server:
             list_of_stop_event.append(stop_event)
             player_listen_thread = Thread(target=self.listen_to_player,args=(conn, stop_event, ))
             list_of_players_threads.append(player_listen_thread)
+        # start all threads together (as possible) to avoid time differances.
         for thread in list_of_players_threads:
             thread.start() 
 
-        time.sleep(10)
+        time.sleep(self.GAME_DURATION)
         for stop_event in list_of_stop_event:
             stop_event.set()
         for thread in list_of_players_threads:
@@ -132,6 +173,11 @@ class server:
 
 
     def listen_to_player(self, conn, stop_event):
+        """
+        method that listen to the client and counts pressing
+        :param conn: the connection of the client
+        :param stop_event: event that will stop the thread
+        """
         score = 0
         while not stop_event.is_set():
             try:
@@ -147,11 +193,20 @@ class server:
           
 
     def random_casting_to_group(self, connection_socket, team_name, group_num):
+        """
+        
+        :param connection_socket: the connection of the client
+        :param team_name: client team name
+        :param group_num: team number for client
+        """
         score = 0
         self.CONNECTIONS_DICT[connection_socket] = [team_name, group_num, score]
     
 
     def message_builder(self):
+        """
+        build the message that the client will recieve and will ynderstand that the game is on.
+        """
         start_message = "Welcome to Keyboard Spamming Battle Royale.\nGroup 1:\n==\n"
         group_1_names = self.get_teams_name_from_group(1)
         start_message += group_1_names
@@ -171,6 +226,9 @@ class server:
 
 
     def reset_server(self):
+        """
+        reset the server and the necessary attributes
+        """
         for sock in self.CONNECTIONS_DICT.keys():
             sock.shutdown(socket.SHUT_RDWR)
             sock.close()
@@ -180,6 +238,10 @@ class server:
 
 
     def run_server(self):
+        """
+        main method of the server. splited to 2 threads, one for udp and one for tcp.
+        at the end of each loop, the server reset.
+        """
         while True:
             udp_thread = Thread(target=self.run_udp)
             tcp_thread = Thread(target=self.run_tcp)
