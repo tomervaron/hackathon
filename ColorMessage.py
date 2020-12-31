@@ -10,10 +10,3 @@ reset = "\033[0;1m"
 
 
 colors = [bold,yellow, green, blue, magenta,red,Cyan]
-to_print = "tomer king"
-to_print_color =""
-for idx, s in enumerate(to_print):
-    if s != "":
-        i = random.randint(0, len(colors) - 1)
-        to_print_color += colors[i] + s + reset
-print(to_print_color)

@@ -15,8 +15,8 @@ class server:
         :param eth_num: 1 for development and 2 for testing.
         building a server object. 
         """
-        self.MAGIC_COOKIE = hex(0xfeedbeef)
-        self.MESSAGE_TYPE = hex(0x2)
+        self.MAGIC_COOKIE = 0xfeedbeef
+        self.MESSAGE_TYPE = 0x2
         self.UDP_PORT = 13107
         self.TCP_PORT = 13118
         self.BUFFER_SIZE = 1024 
