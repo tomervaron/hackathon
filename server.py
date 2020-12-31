@@ -30,13 +30,13 @@ class server:
         while time.time() < end_time:
             broadcast_message = struct.pack('Ibh', 0xfeedbeef, 0x2, self.TCP_PORT)
             self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
-            self.server_socket_udp.sendto(broadcast_message,('<broadcast>', UDP_PORT))
+            self.server_socket_udp.sendto(broadcast_message,('<broadcast>', self.UDP_PORT))
             time.sleep(1)
         server_socket_udp.close()
 
     def run_tcp(self):
         self.random_group_num = random.randint(1,2)
-        print("Server started, listening on IP address "+str(IP_ADDRESS))
+        print("Server started, listening on IP address "+str(self.IP_ADDRESS))
         self.server_socket_tcp.bind(('',self.TCP_PORT))
         self.server_socket_tcp.settimeout(0.5)
         self.server_socket_tcp.listen()
@@ -173,7 +173,7 @@ class server:
             udp_thread.join()
             tcp_thread.join()
             time.sleep(1)
-            reset_server()
+            self.reset_server()
 
 
 if __name__ == "__main__":
