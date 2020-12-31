@@ -15,6 +15,7 @@ class server:
         self.UDP_PORT = 13107
         self.TCP_PORT = 13118
         self.BUFFER_SIZE = 1024
+        self.GAME_ON = False
         self.CONNECTIONS_DICT = {}
         if eth_num == 1:
             self.IP_ADDRESS = get_if_addr("eth1")
@@ -23,24 +24,26 @@ class server:
         self.server_socket_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.random_group_num = 0
+        
 
 
     def run_udp(self):
         end_time = time.time() + 10
+        broadcast_message = struct.pack('Ibh', 0xfeedbeef, 0x2, self.TCP_PORT)
+        self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
         while time.time() < end_time:
-            broadcast_message = struct.pack('Ibh', 0xfeedbeef, 0x2, self.TCP_PORT)
-            self.server_socket_udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
             self.server_socket_udp.sendto(broadcast_message,('<broadcast>', self.UDP_PORT))
             time.sleep(1)
+        self.GAME_ON = True
         self.server_socket_udp.close()
 
     def run_tcp(self):
         self.random_group_num = random.randint(1,2)
         print("Server started, listening on IP address "+str(self.IP_ADDRESS))
-        self.server_socket_tcp.bind(('',self.TCP_PORT))
+        self.server_socket_tcp.bind((self.IP_ADDRESS,self.TCP_PORT))
         self.server_socket_tcp.settimeout(0.5)
         self.server_socket_tcp.listen()
-        while True:
+        while not self.GAME_ON:
             try:
                 connection_socket, client_address = self.server_socket_tcp.accept()
                 team_name = connection_socket.recv(self.BUFFER_SIZE)                
@@ -53,12 +56,13 @@ class server:
                 self.random_group_num = 2
             else:
                 self.random_group_num = 1
-            start_message = self.message_builder()
-            for conn in self.CONNECTIONS_DICT.keys():
-                conn.sendall(start_message.encode("utf-8"))
-            self.run_the_game()
-#             server_socket_tcp.close()
-            break            
+
+        start_message = self.message_builder()
+        for conn in self.CONNECTIONS_DICT.keys():
+            conn.sendall(start_message.encode("utf-8"))
+        self.run_the_game()
+#       server_socket_tcp.close()
+                       
 
     def run_the_game(self):
         self.run_all_listeners()
@@ -102,7 +106,7 @@ class server:
 
     def send_summary_message_to_players(self, summary_message):
         for conn in self.CONNECTIONS_DICT.keys():
-            conn.sendall(game_summary.encode("utf-8"))
+            conn.sendall(summary_message.encode("utf-8"))
 
 
     def run_all_listeners(self):
