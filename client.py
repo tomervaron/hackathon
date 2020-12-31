@@ -7,7 +7,13 @@ from scapy.arch import get_if_addr
 
 
 class client:
+    """
+    client class for the Keyboard Spamming Battle Royale.
+    """
     def __init__(self, team_name):
+        """
+        :param team_name: the client's them name 
+        """
         self.MAGIC_COOKIE = hex(0xfeedbeef)
         self.MESSAGE_TYPE = hex(0x2)
         self.UDP_PORT = 13107
@@ -23,6 +29,9 @@ class client:
         self.client_socket_udp.bind(('', self.UDP_PORT))
 
     def listen_to_udp(self):
+        """
+        method to recieve offers from the server.
+        """
         while True:
             msg , server_address  = self.client_socket_udp.recvfrom(self.BUFFER_SIZE)
             print("Received offer from " + str(server_address[0]) + " attempting to connect...​")
@@ -34,16 +43,26 @@ class client:
                 break          
 
     def connect_to_server_tcp(self):
+        """
+        connect to the server via tcp
+        """
         self.client_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket_tcp.connect((self.server_ip, self.tcp_server_port))
         self.client_socket_tcp.sendall(self.TEAM_NAME.encode("utf-8"))
     
     def wait_for_start_game(self):
+        """
+        get the message that the game is starting
+        """
         start_message = self.client_socket_tcp.recv(self.BUFFER_SIZE)
         print(start_message.decode("utf-8"))
         self.GAME_ON = True
 
     def listen_to_server(self):
+        """
+        while the game is on, the cliect listen to server that will send him when the game is over.
+        in addition, the client gets here the game summary message and print it.
+        """
         while True:
             end_message = self.client_socket_tcp.recv(self.BUFFER_SIZE)
             if end_message.decode("utf-8") == "Game Over" or len(end_message.decode("utf-8")) == 0:
@@ -54,6 +73,9 @@ class client:
 
 
     def listen_to_keyboard(self):
+        """
+        the client listen to the keyboard to get keyboard pressing.
+        """
         with Input(keynames='curtsies') as input_generator:
             while self.GAME_ON:
                 key = input_generator.send(0.5)
@@ -63,6 +85,10 @@ class client:
                     self.on_press(key)
 
     def on_press(self, key):
+        """
+        send to the server that the key pressed.
+        :param key: the key that the client pressed on
+        """
         try:
             self.client_socket_tcp.sendall("{}".format(key).encode("utf-8"))
         except:
@@ -70,17 +96,27 @@ class client:
             raise Exception
 
     def play(self):
+        """
+        in 1 thread the client listening to the server and in the main thread listening to keyboard.
+        """
         listen_to_server_thread = Thread(target=self.listen_to_server)
         listen_to_server_thread.start()
         self.listen_to_keyboard()
         listen_to_server_thread.join()
     
     def reset_client(self):
+        """
+        reset the client and the necessary attributes
+        """
         self.GAME_ON = False
         self.tcp_server_port = None
         self.server_ip = None
 
     def run_client(self):
+        """
+        main method of the client.
+        at the end of each loop, the client reset.
+        """
         while True:
             try:
                 print("​Client started, listening for offer requests...​")
@@ -96,6 +132,6 @@ class client:
 
         
 if __name__ == "__main__":
-    team_name = "Tomer's Team"
+    team_name = "Happy NoviGod"
     client = client(team_name)
     client.run_client()
